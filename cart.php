@@ -49,7 +49,7 @@ if(isset($_POST['form1'])) {
         }
         if($table_quantity[$temp_index] < $arr2[$i]) {
         	$allow_update = 0;
-            $error_message .= '"'.$arr2[$i].'" items are not available for "'.$arr3[$i].'"\n';
+            $error_message .= '"'. $arr2[$i].'" items are not available for "'.$arr3[$i].'"\n';
         } else {
             $_SESSION['cart_p_qty'][$i] = $arr2[$i];
         }
