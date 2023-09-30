@@ -49,7 +49,8 @@ if(isset($_POST['form1'])) {
         }
         if($table_quantity[$temp_index] < $arr2[$i]) {
         	$allow_update = 0;
-            $error_message .= '"'.$arr2[$i].'" items are not available for "'.$arr3[$i].'"\n';
+            // Modified Code
+            $error_message .= '"'. htmlspecialchars($arr2[$i]).'" items are not available for "'.$arr3[$i].'"\n';
         } else {
             $_SESSION['cart_p_qty'][$i] = $arr2[$i];
         }
@@ -58,7 +59,8 @@ if(isset($_POST['form1'])) {
     ?>
     
     <?php if($allow_update == 0): ?>
-    	<script>alert('<?php echo $error_message; ?>');</script>
+        // Modified Code
+    	<script>alert('<?php echo htmlspecialchars($error_message); ?>');</script>
 	<?php else: ?>
 		<script>alert('All Items Quantity Update is Successful!');</script>
 	<?php endif; ?>
@@ -168,9 +170,10 @@ if(isset($_POST['form1'])) {
                         <tr>
                             <td><?php echo $i; ?></td>
                             <td>
-                                <img src="assets/uploads/<?php echo $arr_cart_p_featured_photo[$i]; ?>" alt="">
+                                // Modified Code
+                                <img src="assets/uploads/<?php echo htmlspecialchars ($arr_cart_p_featured_photo[$i]); ?>" alt="">
                             </td>
-                            <td><?php echo $arr_cart_p_name[$i]; ?></td>
+                            <td><?php echo htmlspecialchars($arr_cart_p_name[$i]); ?></td>
                             <td><?php echo $arr_cart_size_name[$i]; ?></td>
                             <td><?php echo $arr_cart_color_name[$i]; ?></td>
                             <td><?php echo LANG_VALUE_1; ?><?php echo $arr_cart_p_current_price[$i]; ?></td>
