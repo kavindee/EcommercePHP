@@ -5,9 +5,10 @@ if(!isset($_REQUEST['search_text'])) {
     header('location: index.php');
     exit;
 } else {
-	if($_REQUEST['search_text']=='') {
-		header('location: index.php');
-    	exit;
+    $search_text = strip_tags($_REQUEST['search_text']); // Sanitize the input
+    if ($search_text == '') {
+        header('location: index.php');
+        exit;
 	}
 }
 ?>

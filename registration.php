@@ -13,22 +13,42 @@ foreach ($result as $row) {
 if (isset($_POST['form1'])) {
 
     $valid = 1;
+    $error_message = ''; // Inititalize the error message
 
-    if(empty($_POST['cust_name'])) {
+    // Sanitize and validate user inputs
+
+    $cust_name = filter_var($_POST['cust_name'], FILTER_SANITIZE_STRING);
+    $cust_cname = filter_var($_POST['cust_cname'], FILTER_SANITIZE_STRING);
+    $cust_email = filter_var($_POST['cust_email'], FILTER_SANITIZE_EMAIL);
+    $cust_phone = filter_var($_POST['cust_phone'], FILTER_SANITIZE_STRING);
+    $cust_address = filter_var($_POST['cust_address'], FILTER_SANITIZE_STRING);
+    $cust_city = filter_var($_POST['cust_city'], FILTER_SANITIZE_STRING);
+    $cust_state = filter_var($_POST['cust_state'], FILTER_SANITIZE_STRING);
+    $cust_zip = filter_var($_POST['cust_zip'], FILTER_SANITIZE_STRING);
+    $cust_password = $_POST['cust_password'];
+    $cust_re_password = $_POST['cust_re_password'];
+
+    // Perform validation on sanitized inputs
+
+    if(empty($cust_name)) {
         $valid = 0;
         $error_message .= LANG_VALUE_123."<br>";
     }
+    if (empty($cust_cname)) {
+        $valid = 0;
+        $error_message .= LANG_VALUE_123 . "<br>";
+    }
 
-    if(empty($_POST['cust_email'])) {
+    if(empty($cust_email)) {
         $valid = 0;
         $error_message .= LANG_VALUE_131."<br>";
     } else {
-        if (filter_var($_POST['cust_email'], FILTER_VALIDATE_EMAIL) === false) {
+        if (filter_var($cust_email, FILTER_VALIDATE_EMAIL) === false) {
             $valid = 0;
             $error_message .= LANG_VALUE_134."<br>";
         } else {
             $statement = $pdo->prepare("SELECT * FROM tbl_customer WHERE cust_email=?");
-            $statement->execute(array($_POST['cust_email']));
+            $statement->execute(array($cust_email));
             $total = $statement->rowCount();                            
             if($total) {
                 $valid = 0;
@@ -37,12 +57,12 @@ if (isset($_POST['form1'])) {
         }
     }
 
-    if(empty($_POST['cust_phone'])) {
+    if(empty($cust_phone)) {
         $valid = 0;
         $error_message .= LANG_VALUE_124."<br>";
     }
 
-    if(empty($_POST['cust_address'])) {
+    if(empty($cust_address)) {
         $valid = 0;
         $error_message .= LANG_VALUE_125."<br>";
     }
@@ -52,28 +72,28 @@ if (isset($_POST['form1'])) {
         $error_message .= LANG_VALUE_126."<br>";
     }
 
-    if(empty($_POST['cust_city'])) {
+    if(empty($cust_city)) {
         $valid = 0;
         $error_message .= LANG_VALUE_127."<br>";
     }
 
-    if(empty($_POST['cust_state'])) {
+    if(empty($cust_state)) {
         $valid = 0;
         $error_message .= LANG_VALUE_128."<br>";
     }
 
-    if(empty($_POST['cust_zip'])) {
+    if(empty($cust_zip)) {
         $valid = 0;
         $error_message .= LANG_VALUE_129."<br>";
     }
 
-    if( empty($_POST['cust_password']) || empty($_POST['cust_re_password']) ) {
+    if( empty($cust_password) || empty($cust_re_password) ) {
         $valid = 0;
         $error_message .= LANG_VALUE_138."<br>";
     }
 
-    if( !empty($_POST['cust_password']) && !empty($_POST['cust_re_password']) ) {
-        if($_POST['cust_password'] != $_POST['cust_re_password']) {
+    if( !empty($cust_password) && !empty($cust_re_password) ) {
+        if($cust_password != $cust_re_password) {
             $valid = 0;
             $error_message .= LANG_VALUE_139."<br>";
         }
@@ -119,15 +139,15 @@ if (isset($_POST['form1'])) {
                                         cust_status
                                     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         $statement->execute(array(
-                                        strip_tags($_POST['cust_name']),
-                                        strip_tags($_POST['cust_cname']),
-                                        strip_tags($_POST['cust_email']),
-                                        strip_tags($_POST['cust_phone']),
+                                        $cust_name,
+                                        $cust_cname,
+                                        $cust_email,
+                                        $cust_phone,
                                         strip_tags($_POST['cust_country']),
-                                        strip_tags($_POST['cust_address']),
-                                        strip_tags($_POST['cust_city']),
-                                        strip_tags($_POST['cust_state']),
-                                        strip_tags($_POST['cust_zip']),
+                                        $cust_address,
+                                        $cust_city,
+                                        $cust_state,
+                                        $cust_zip,
                                         '',
                                         '',
                                         '',
@@ -144,7 +164,7 @@ if (isset($_POST['form1'])) {
                                         '',
                                         '',
                                         '',
-                                        md5($_POST['cust_password']),
+                                        md5($cust_password),
                                         $token,
                                         $cust_datetime,
                                         $cust_timestamp,
@@ -152,7 +172,7 @@ if (isset($_POST['form1'])) {
                                     ));
 
         // Send email for confirmation of the account
-        $to = $_POST['cust_email'];
+        $to = $cust_email;
         
         $subject = LANG_VALUE_150;
         $verify_link = BASE_URL.'verify.php?email='.$to.'&token='.$token;
@@ -215,23 +235,23 @@ if (isset($_POST['form1'])) {
 
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_102; ?> *</label>
-                                    <input type="text" class="form-control" name="cust_name" value="<?php if(isset($_POST['cust_name'])){echo $_POST['cust_name'];} ?>">
+                                    <input type="text" class="form-control" name="cust_name" value="<?php if(isset($cust_name)){echo $cust_name;} ?>">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_103; ?></label>
-                                    <input type="text" class="form-control" name="cust_cname" value="<?php if(isset($_POST['cust_cname'])){echo $_POST['cust_cname'];} ?>">
+                                    <input type="text" class="form-control" name="cust_cname" value="<?php if(isset($cust_cname)){echo $cust_cname;} ?>">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_94; ?> *</label>
-                                    <input type="email" class="form-control" name="cust_email" value="<?php if(isset($_POST['cust_email'])){echo $_POST['cust_email'];} ?>">
+                                    <input type="email" class="form-control" name="cust_email" value="<?php if(isset($cust_email)){echo $cust_email;} ?>">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_104; ?> *</label>
-                                    <input type="text" class="form-control" name="cust_phone" value="<?php if(isset($_POST['cust_phone'])){echo $_POST['cust_phone'];} ?>">
+                                    <input type="number" class="form-control"  name="cust_phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" value="<?php if(isset($cust_phone)){echo $cust_phone;} ?>">
                                 </div>
                                 <div class="col-md-12 form-group">
                                     <label for=""><?php echo LANG_VALUE_105; ?> *</label>
-                                    <textarea name="cust_address" class="form-control" cols="30" rows="10" style="height:70px;"><?php if(isset($_POST['cust_address'])){echo $_POST['cust_address'];} ?></textarea>
+                                    <textarea name="cust_address" class="form-control" cols="30" rows="10" style="height:70px;"><?php if(isset($cust_address)){echo $cust_address;} ?></textarea>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_106; ?> *</label>
@@ -252,15 +272,15 @@ if (isset($_POST['form1'])) {
                                 
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_107; ?> *</label>
-                                    <input type="text" class="form-control" name="cust_city" value="<?php if(isset($_POST['cust_city'])){echo $_POST['cust_city'];} ?>">
+                                    <input type="text" class="form-control" name="cust_city" value="<?php if(isset($cust_city)){echo $cust_city;} ?>">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_108; ?> *</label>
-                                    <input type="text" class="form-control" name="cust_state" value="<?php if(isset($_POST['cust_state'])){echo $_POST['cust_state'];} ?>">
+                                    <input type="text" class="form-control" name="cust_state" value="<?php if(isset($cust_state)){echo $cust_state;} ?>">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_109; ?> *</label>
-                                    <input type="text" class="form-control" name="cust_zip" value="<?php if(isset($_POST['cust_zip'])){echo $_POST['cust_zip'];} ?>">
+                                    <input type="text" class="form-control" name="cust_zip" value="<?php if(isset($cust_zip)){echo $cust_zip;} ?>">
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_96; ?> *</label>
