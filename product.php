@@ -1,6 +1,10 @@
 <?php require_once('header.php'); ?>
 
 <?php
+ob_start();
+session_start();
+include("admin/inc/CSRF_Protect.php");
+$csrf = new CSRF_Protect();
 if (!isset($_REQUEST['id'])) {
     header('location: index.php');
     exit;
@@ -404,6 +408,7 @@ if ($success_message1 != '') {
                                 </p>
                             </div>
                             <form action="" method="post">
+                                <?php $csrf->echoInputField(); ?>
                                 <div class="p-quantity">
                                     <div class="row">
                                         <?php if (isset($size)) : ?>
@@ -609,6 +614,7 @@ if ($success_message1 != '') {
                                             ?>
                                             <?php if ($total == 0) : ?>
                                                 <form action="" method="post">
+                                                    <?php $csrf->echoInputField(); ?>
                                                     <div class="rating-section">
                                                         <input type="radio" name="rating" class="rating" value="1" checked>
                                                         <input type="radio" name="rating" class="rating" value="2" checked>
