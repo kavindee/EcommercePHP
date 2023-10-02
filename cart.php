@@ -49,17 +49,15 @@ if(isset($_POST['form1'])) {
         }
         if($table_quantity[$temp_index] < $arr2[$i]) {
         	$allow_update = 0;
-            // Modified Code
-            $error_message .= '"'. htmlspecialchars($arr2[$i]).'" items are not available for "'.$arr3[$i].'"\n';
+            $error_message .= htmlspecialchars($arr2[$i]) . ' items are not available for ' . htmlspecialchars($arr3[$i]) . "\n";
         } else {
             $_SESSION['cart_p_qty'][$i] = $arr2[$i];
         }
     }
-    $error_message .= '\nOther items quantity are updated successfully!';
+    $error_message .= "\nOther items' quantity are updated successfully!";
     ?>
     
     <?php if($allow_update == 0): ?>
-        // Modified Code
     	<script>alert('<?php echo htmlspecialchars($error_message); ?>');</script>
 	<?php else: ?>
 		<script>alert('All Items Quantity Update is Successful!');</script>
@@ -111,10 +109,10 @@ if(isset($_POST['form1'])) {
                         }
 
                         $i=0;
-                        foreach(htmlspecialchars($_SESSION['cart_size_id']) as $key => $value) 
+                        foreach($_SESSION['cart_size_id'] as $key => $value) 
                         {
                             $i++;
-                            htmlspecialchars($arr_cart_size_id[$i]) = $value;
+                            $arr_cart_size_id[$i] = $value;
                         }
 
                         $i=0;
@@ -170,8 +168,7 @@ if(isset($_POST['form1'])) {
                         <tr>
                             <td><?php echo $i; ?></td>
                             <td>
-                                // Modified Code
-                                <img src="assets/uploads/<?php echo htmlspecialchars ($arr_cart_p_featured_photo[$i]); ?>" alt="">
+                                <img src="assets/uploads/<?php echo htmlspecialchars($arr_cart_p_featured_photo[$i]); ?>" alt="">
                             </td>
                             <td><?php echo htmlspecialchars($arr_cart_p_name[$i]); ?></td>
                             <td><?php echo htmlspecialchars($arr_cart_size_name[$i]); ?></td>
@@ -212,12 +209,9 @@ if(isset($_POST['form1'])) {
                 </form>
                 <?php endif; ?>
 
-                
-
 			</div>
 		</div>
 	</div>
 </div>
-
 
 <?php require_once('footer.php'); ?>
