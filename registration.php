@@ -25,8 +25,11 @@ if (isset($_POST['form1'])) {
     $cust_city = filter_var($_POST['cust_city'], FILTER_SANITIZE_STRING);
     $cust_state = filter_var($_POST['cust_state'], FILTER_SANITIZE_STRING);
     $cust_zip = filter_var($_POST['cust_zip'], FILTER_SANITIZE_STRING);
-    $cust_password = $_POST['cust_password'];
-    $cust_re_password = $_POST['cust_re_password'];
+    $salt = bin2hex(random_bytes(16)); // 16 bytes (128 bits) is a good length for a salt
+    $saltedPassword = $salt . $_POST['cust_password'];
+    $saltedRePassword = $salt . $_POST['cust_re_password'];
+    $hashedPassword = hash('sha256', $saltedPassword);
+    $cust_re_password = hash('sha256', $saltedRePassword);
 
     // Perform validation on sanitized inputs
 
@@ -87,19 +90,20 @@ if (isset($_POST['form1'])) {
         $error_message .= LANG_VALUE_129."<br>";
     }
 
-    if( empty($cust_password) || empty($cust_re_password) ) {
+    if( empty($hashedPassword) || empty($cust_re_password) ) {
         $valid = 0;
         $error_message .= LANG_VALUE_138."<br>";
     }
 
-    if( !empty($cust_password) && !empty($cust_re_password) ) {
-        if($cust_password != $cust_re_password) {
+    if( !empty($hashedPassword) && !empty($cust_re_password) ) {
+        if($hashedPassword != $cust_re_password) {
             $valid = 0;
             $error_message .= LANG_VALUE_139."<br>";
         }
     }
 
     if($valid == 1) {
+        
 
         $token = md5(time());
         $cust_datetime = date('Y-m-d h:i:s');
@@ -132,12 +136,13 @@ if (isset($_POST['form1'])) {
                                         cust_s_city,
                                         cust_s_state,
                                         cust_s_zip,
+                                        cust_salt,
                                         cust_password,
                                         cust_token,
                                         cust_datetime,
                                         cust_timestamp,
                                         cust_status
-                                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         $statement->execute(array(
                                         $cust_name,
                                         $cust_cname,
@@ -164,7 +169,8 @@ if (isset($_POST['form1'])) {
                                         '',
                                         '',
                                         '',
-                                        md5($cust_password),
+                                        $salt, // Store the salt in the database
+                                        $hashedPassword, // Store the hashed password in the database
                                         $token,
                                         $cust_datetime,
                                         $cust_timestamp,
@@ -203,6 +209,16 @@ if (isset($_POST['form1'])) {
     }
 }
 ?>
+<?php
+        // Given password
+        $password12 = 'user-input-pass';
+
+        // Validate password strength
+        $uppercase = preg_match('@[A-Z]@', $password12);
+        $lowercase = preg_match('@[a-z]@', $password12);
+        $number    = preg_match('@[0-9]@', $password12);
+        $specialChars = preg_match('@[^\w]@', $password12); 
+        ?>
 
 <div class="page-banner" style="background-color:#444;background-image: url(assets/uploads/<?php echo $banner_registration; ?>);">
     <div class="inner">
@@ -284,11 +300,11 @@ if (isset($_POST['form1'])) {
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_96; ?> *</label>
-                                    <input type="password" class="form-control" name="cust_password">
+                                    <input type="password" class="form-control" name="cust_password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter and Special Character, and at least 8 or more characters" required>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""><?php echo LANG_VALUE_98; ?> *</label>
-                                    <input type="password" class="form-control" name="cust_re_password">
+                                    <input type="password" class="form-control" name="cust_re_password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter and Special Character, and at least 8 or more characters" required>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for=""></label>
