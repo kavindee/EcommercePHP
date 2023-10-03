@@ -39,11 +39,14 @@ if (isset($_POST['form1'])) {
         // update data into the database
 
         $password = strip_tags($_POST['cust_password']);
+        $salt = bin2hex(random_bytes(16)); // Generate a new salt
+        $saltedPassword = $salt . $password; // Combine salt and password
+        $hashedPassword = hash('sha256', $saltedPassword); // Hash the combined value
         
-        $statement = $pdo->prepare("UPDATE tbl_customer SET cust_password=? WHERE cust_id=?");
-        $statement->execute(array(md5($password),$_SESSION['customer']['cust_id']));
+        $statement = $pdo->prepare("UPDATE tbl_customer SET cust_salt=?,cust_password=? WHERE cust_id=?");
+        $statement->execute(array($salt, $hashedPassword, $_SESSION['customer']['cust_id']));
         
-        $_SESSION['customer']['cust_password'] = md5($password);        
+        $_SESSION['customer']['cust_password'] = $hashedPassword;   // Update the session password     
 
         $success_message = LANG_VALUE_141;
     }
