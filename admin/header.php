@@ -4,6 +4,7 @@ session_start();
 include("inc/config.php");
 include("inc/functions.php");
 include("inc/CSRF_Protect.php");
+include("inc/scpBuilder.php");
 $csrf = new CSRF_Protect();
 $error_message = '';
 $success_message = '';
@@ -15,6 +16,9 @@ if(!isset($_SESSION['user'])) {
 	header('location: login.php');
 	exit;
 }
+// Set the Content Security Policy header
+addContentSecurityPolicy();
+
 ?>
 
 <!DOCTYPE html>
