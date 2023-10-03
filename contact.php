@@ -93,7 +93,8 @@ if(isset($_POST['form_contact']))
         $visitor_name = strip_tags($_POST['visitor_name']);
         $visitor_email = strip_tags($_POST['visitor_email']);
         $visitor_phone = strip_tags($_POST['visitor_phone']);
-        $visitor_message = strip_tags($_POST['visitor_message']);
+        //$visitor_message = strip_tags($_POST['visitor_message']);
+        $visitor_message = filter_var($_POST['visitor_message'], FILTER_SANITIZE_FULL_SPECIAL_CHARS); //sanitization and validation input
 
         // Bind parameters and execute the prepared statement
         $insertStatement->bindParam(1, $visitor_name);
