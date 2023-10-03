@@ -11,13 +11,15 @@ foreach ($result as $row) {
 <!-- login form -->
 <?php
 if(isset($_POST['form1'])) {
+
+    $error_message = '';
         
     if(empty($_POST['cust_email']) || empty($_POST['cust_password'])) {
         $error_message = LANG_VALUE_132.'<br>';
     } else {
         
         $cust_email = strip_tags($_POST['cust_email']);
-        $cust_password = strip_tags($_POST['cust_password']);
+        $cust_password = $_POST['cust_password']; //strip_tags($_POST['cust_password']);
 
         $statement = $pdo->prepare("SELECT * FROM tbl_customer WHERE cust_email=?");
         $statement->execute(array($cust_email));
@@ -26,15 +28,24 @@ if(isset($_POST['form1'])) {
         foreach($result as $row) {
             $cust_status = $row['cust_status'];
             $row_password = $row['cust_password'];
+            $storedSalt = $row['cust_salt'];
+            $storedHashedPassword = $row['cust_password'];
+            $cust_status = $row['cust_status'];
         }
 
         if($total==0) {
             $error_message .= LANG_VALUE_133.'<br>';
         } else {
-            //using MD5 form
-            if( $row_password != md5($cust_password) ) {
+            //using SHA256 form
+            
+            // Hash the provided password with the stored salt
+            $saltedPassword = $storedSalt . $cust_password;
+            $inputPasswordHashed = hash('sha256', $saltedPassword);
+
+            if( $storedHashedPassword !== $inputPasswordHashed ) {
                 $error_message .= LANG_VALUE_139.'<br>';
             } else {
+               
                 if($cust_status == 0) {
                     $error_message .= LANG_VALUE_148.'<br>';
                 } else {
