@@ -49,17 +49,15 @@ if(isset($_POST['form1'])) {
         }
         if($table_quantity[$temp_index] < $arr2[$i]) {
         	$allow_update = 0;
-            // Modified Code
-            $error_message .= '"'. htmlspecialchars($arr2[$i]).'" items are not available for "'.$arr3[$i].'"\n';
+            $error_message .= htmlspecialchars($arr2[$i]) . ' items are not available for ' . htmlspecialchars($arr3[$i]) . "\n";
         } else {
             $_SESSION['cart_p_qty'][$i] = $arr2[$i];
         }
     }
-    $error_message .= '\nOther items quantity are updated successfully!';
+    $error_message .= "\nOther items' quantity are updated successfully!";
     ?>
     
     <?php if($allow_update == 0): ?>
-        // Modified Code
     	<script>alert('<?php echo htmlspecialchars($error_message); ?>');</script>
 	<?php else: ?>
 		<script>alert('All Items Quantity Update is Successful!');</script>
@@ -69,7 +67,7 @@ if(isset($_POST['form1'])) {
 }
 ?>
 
-<div class="page-banner" style="background-image: url(assets/uploads/<?php echo $banner_cart; ?>)">
+<div class="page-banner" style="background-image: url(assets/uploads/<?php echo htmlspecialchars($banner_cart); ?>)">
     <div class="overlay"></div>
     <div class="page-banner-inner">
         <h1><?php echo LANG_VALUE_18; ?></h1>
@@ -111,10 +109,10 @@ if(isset($_POST['form1'])) {
                         }
 
                         $i=0;
-                        foreach($_SESSION['cart_size_id'] as $key => $value) 
+                        foreach(htmlspecialchars($_SESSION['cart_size_id']) as $key => $value) 
                         {
                             $i++;
-                            $arr_cart_size_id[$i] = $value;
+                            htmlspecialchars($arr_cart_size_id[$i]) = $value;
                         }
 
                         $i=0;
@@ -125,10 +123,10 @@ if(isset($_POST['form1'])) {
                         }
 
                         $i=0;
-                        foreach($_SESSION['cart_color_id'] as $key => $value) 
+                        foreach(htmlspecialchars($_SESSION['cart_color_id']) as $key => $value) 
                         {
                             $i++;
-                            $arr_cart_color_id[$i] = $value;
+                            htmlspecialchars($arr_cart_color_id[$i]) = $value;
                         }
 
                         $i=0;
@@ -170,16 +168,15 @@ if(isset($_POST['form1'])) {
                         <tr>
                             <td><?php echo $i; ?></td>
                             <td>
-                                // Modified Code
-                                <img src="assets/uploads/<?php echo htmlspecialchars ($arr_cart_p_featured_photo[$i]); ?>" alt="">
+                                <img src="assets/uploads/<?php echo htmlspecialchars($arr_cart_p_featured_photo[$i]); ?>" alt="">
                             </td>
                             <td><?php echo htmlspecialchars($arr_cart_p_name[$i]); ?></td>
-                            <td><?php echo $arr_cart_size_name[$i]; ?></td>
-                            <td><?php echo $arr_cart_color_name[$i]; ?></td>
+                            <td><?php echo htmlspecialchars($arr_cart_size_name[$i]); ?></td>
+                            <td><?php echo htmlspecialchars($arr_cart_color_name[$i]); ?></td>
                             <td><?php echo LANG_VALUE_1; ?><?php echo $arr_cart_p_current_price[$i]; ?></td>
                             <td>
-                                <input type="hidden" name="product_id[]" value="<?php echo $arr_cart_p_id[$i]; ?>">
-                                <input type="hidden" name="product_name[]" value="<?php echo $arr_cart_p_name[$i]; ?>">
+                                <input type="hidden" name="product_id[]" value="<?php echo htmlspecialchars($arr_cart_p_id[$i]); ?>">
+                                <input type="hidden" name="product_name[]" value="<?php echo htmlspecialchars($arr_cart_p_name[$i]); ?>">
                                 <input type="number" class="input-text qty text" step="1" min="1" max="" name="quantity[]" value="<?php echo $arr_cart_p_qty[$i]; ?>" title="Qty" size="4" pattern="[0-9]*" inputmode="numeric">
                             </td>
                             <td class="text-right">
@@ -190,7 +187,7 @@ if(isset($_POST['form1'])) {
                                 <?php echo LANG_VALUE_1; ?><?php echo $row_total_price; ?>
                             </td>
                             <td class="text-center">
-                                <a onclick="return confirmDelete();" href="cart-item-delete.php?id=<?php echo $arr_cart_p_id[$i]; ?>&size=<?php echo $arr_cart_size_id[$i]; ?>&color=<?php echo $arr_cart_color_id[$i]; ?>" class="trash"><i class="fa fa-trash" style="color:red;"></i></a>
+                                <a onclick="return confirmDelete();" href="cart-item-delete.php?id=<?php echo $arr_cart_p_id[$i]; ?>&size=<?php echo htmlspecialchars($arr_cart_size_id[$i]); ?>&color=<?php echo htmlspecialchars($arr_cart_color_id[$i]); ?>" class="trash"><i class="fa fa-trash" style="color:red;"></i></a>
                             </td>
                         </tr>
                         <?php endfor; ?>
@@ -212,12 +209,9 @@ if(isset($_POST['form1'])) {
                 </form>
                 <?php endif; ?>
 
-                
-
 			</div>
 		</div>
 	</div>
 </div>
-
 
 <?php require_once('footer.php'); ?>
