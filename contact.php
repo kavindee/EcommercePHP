@@ -88,13 +88,23 @@ if(isset($_POST['form_contact']))
 
     if($valid == 1)
     {
-        
+        $insertStatement = $pdo->prepare("INSERT INTO tbl_contact (visitor_name, visitor_email, visitor_phone, visitor_message) VALUES(?, ?, ?, ?)");
+
         $visitor_name = strip_tags($_POST['visitor_name']);
         $visitor_email = strip_tags($_POST['visitor_email']);
         $visitor_phone = strip_tags($_POST['visitor_phone']);
         $visitor_message = strip_tags($_POST['visitor_message']);
 
-        // sending email
+        // Bind parameters and execute the prepared statement
+        $insertStatement->bindParam(1, $visitor_name);
+        $insertStatement->bindParam(2, $visitor_email);
+        $insertStatement->bindParam(3, $visitor_phone);
+        $insertStatement->bindParam(4, $visitor_message);
+
+
+        if($insertStatement->execute()){
+            
+            // sending email
         $to_admin = $receive_email;
         $subject = $receive_email_subject;
         $message = '
@@ -129,6 +139,10 @@ if(isset($_POST['form_contact']))
         mail($to_admin, $subject, $message, $headers); 
         
         $success_message = $receive_email_thank_you_message;
+
+        }else{
+            $error_message = 'Error inserting data into the database.';
+        }
 
     }
 }
