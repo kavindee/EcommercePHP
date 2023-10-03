@@ -128,7 +128,8 @@ if (isset($_POST['form_add_to_cart'])) {
     foreach ($result as $row) {
         $current_p_qty = $row['p_qty'];
     }
-    if ($_POST['p_qty'] > $current_p_qty) :
+    // if ($_POST['p_qty'] > $current_p_qty) :
+    if (!isset($_POST['p_qty']) || !is_numeric($_POST['p_qty']) || $_POST['p_qty'] <= 0 || $_POST['p_qty'] > $current_p_qty) :
         $temp_msg = 'Sorry! There are only ' . $current_p_qty . ' item(s) in stock';
 ?>
         <script type="text/javascript">
