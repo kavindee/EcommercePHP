@@ -109,10 +109,10 @@ if(isset($_POST['form1'])) {
                         }
 
                         $i=0;
-                        foreach($_SESSION['cart_size_id'] as $key => $value) 
+                        foreach(htmlspecialchars($_SESSION['cart_size_id']) as $key => $value) 
                         {
                             $i++;
-                            $arr_cart_size_id[$i] = $value;
+                            htmlspecialchars($arr_cart_size_id[$i]) = $value;
                         }
 
                         $i=0;
@@ -123,10 +123,10 @@ if(isset($_POST['form1'])) {
                         }
 
                         $i=0;
-                        foreach($_SESSION['cart_color_id'] as $key => $value) 
+                        foreach(htmlspecialchars($_SESSION['cart_color_id']) as $key => $value) 
                         {
                             $i++;
-                            $arr_cart_color_id[$i] = $value;
+                            htmlspecialchars($arr_cart_color_id[$i]) = $value;
                         }
 
                         $i=0;
@@ -187,7 +187,7 @@ if(isset($_POST['form1'])) {
                                 <?php echo LANG_VALUE_1; ?><?php echo $row_total_price; ?>
                             </td>
                             <td class="text-center">
-                                <a onclick="return confirmDelete();" href="cart-item-delete.php?id=<?php echo $arr_cart_p_id[$i]; ?>&size=<?php echo htmlspecialchars($arr_cart_size_id[$i]); ?>&color=<?php echo $arr_cart_color_id[$i]; ?>" class="trash"><i class="fa fa-trash" style="color:red;"></i></a>
+                                <a onclick="return confirmDelete();" href="cart-item-delete.php?id=<?php echo $arr_cart_p_id[$i]; ?>&size=<?php echo htmlspecialchars($arr_cart_size_id[$i]); ?>&color=<?php echo htmlspecialchars($arr_cart_color_id[$i]); ?>" class="trash"><i class="fa fa-trash" style="color:red;"></i></a>
                             </td>
                         </tr>
                         <?php endfor; ?>
