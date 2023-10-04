@@ -1,6 +1,42 @@
 <?php require_once('header.php'); ?>
 <!-- fetching row banner login -->
 <?php
+
+if (isset($_SESSION['access_token'])) {
+    // Access token exists, check if it's still valid
+    if (isAccessTokenValid($_SESSION['access_token'])) {
+        header("location: http://localhost:8080/EcommercePHP/index.php");
+    } else {
+        // Access token is expired, you may need to refresh it if you have a refresh token.
+        // If not, consider prompting the user to log in again.
+    }
+}
+
+function isAccessTokenValid($accessToken) {
+
+    $ch = curl_init();
+    
+    $tokenInfoUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" . urlencode($accessToken);
+    curl_setopt($ch, CURLOPT_URL, $tokenInfoUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    
+    if ($response === false) {
+        return false;
+    }
+    
+    $tokenInfo = json_decode($response, true);
+    
+    if (isset($tokenInfo['exp']) && $tokenInfo['exp'] >= time()) {
+        return true;
+    } else {
+        return false;
+    }
+    
+    curl_close($ch);
+}
+
 $statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
 $statement->execute();
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);                            
@@ -8,6 +44,7 @@ foreach ($result as $row) {
     $banner_login = $row['banner_login'];
 }
 ?>
+
 <!-- login form -->
 <?php
 if(isset($_POST['form1'])) {
@@ -39,12 +76,52 @@ if(isset($_POST['form1'])) {
                     $error_message .= LANG_VALUE_148.'<br>';
                 } else {
                     $_SESSION['customer'] = $row;
-                    header("location: ".BASE_URL."dashboard.php");
+                    $sessionLog = $_SESSION['customer'];
+                    echo "<script>console.log($sessionLog);</script>";
+                    // header("location: ".BASE_URL."dashboard.php");
                 }
             }
             
         }
     }
+}
+?>
+
+<?php
+if(isset($_GET['code'])){
+
+    $token = $gclient->fetchAccessTokenWithAuthCode($_GET['code']);
+ 
+    if(!isset($token['error'])){
+        $gclient->setAccessToken($token['access_token']);
+ 
+        $_SESSION['access_token'] = $token['access_token'];
+ 
+        $gservice = new Google_Service_Oauth2($gclient);
+
+         $udata = $gservice->userinfo->get();
+
+        foreach($udata as $k => $v){
+            $_SESSION['login_'.$k] = $v;
+        }
+        $_SESSION['ucode'] = $_GET['code'];
+        $_SESSION['authenticated'] = true;
+
+            header("location: http://localhost:8080/EcommercePHP/index.php");
+            exit;
+        
+    }
+    else{
+        echo "<script>console.log('Token errorrr');</script>";
+    }
+}
+else if(isset($_GET['error'])){
+        $error = $_GET['error'];
+        $errorDescription = $_GET['error_description'];
+        echo "<script>console.log('OAuth Error: $error - $errorDescription');</script>";
+    }
+else {
+    echo "<script>console.log('No code parameter in the URL.');</script>";
 }
 ?>
 
@@ -84,7 +161,9 @@ if(isset($_POST['form1'])) {
                                 </div>
                                 <div class="form-group">
                                     <label for=""></label>
+                                    <a href="<?= $gclient->createAuthUrl() ?>" class="btn btn btn-primary btn-flat rounded-0">Login with Google</a>
                                     <input type="submit" class="btn btn-success" value="<?php echo LANG_VALUE_4; ?>" name="form1">
+                                    </a>
                                 </div>
                                 <a href="forget-password.php" style="color:#e4144d;"><?php echo LANG_VALUE_97; ?>?</a>
                             </div>

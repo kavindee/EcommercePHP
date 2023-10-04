@@ -2,6 +2,7 @@
 <?php
 ob_start();
 session_start();
+require_once('vendor/autoload.php');
 include("admin/inc/config.php");
 include("admin/inc/functions.php");
 include("admin/inc/CSRF_Protect.php");
@@ -10,6 +11,21 @@ $error_message = '';
 $success_message = '';
 $error_message1 = '';
 $success_message1 = '';
+
+header("X-Frame-Options: SAMEORIGIN");
+
+$clientID = "888622912211-dgesi6g2vnjkatd7fp8a9llecj9nm3da.apps.googleusercontent.com";
+$secret = "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";
+$apiKey = "AIzaSyCY07ssihuhn88RtQiGUuPu4BB96_gpLFc";
+
+$gclient = new Google_Client();
+$gclient->setClientId($clientID);
+$gclient->setClientSecret($secret);
+$gclient->setRedirectUri('http://localhost:8080/EcommercePHP/login.php');
+// $gclient->setApiKey($apiKey);
+$gclient->addScope('email');
+$gclient->addScope('profile');
+
 
 // Getting all language variables into array as global variable
 $i=1;
@@ -41,7 +57,8 @@ foreach ($result as $row)
 $current_date_time = date('Y-m-d H:i:s');
 $statement = $pdo->prepare("SELECT * FROM tbl_payment WHERE payment_status=?");
 $statement->execute(array('Pending'));
-$result = $statement->fetchAll(PDO::FETCH_ASSOC);							
+$result = $statement->fetchAll(PDO::FETCH_ASSOC);	
+
 foreach ($result as $row) {
 	$ts1 = strtotime($row['payment_date']);
 	$ts2 = strtotime($current_date_time);     
@@ -74,6 +91,7 @@ foreach ($result as $row) {
 		$statement1->execute(array($row['id']));
 	}
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -292,11 +310,18 @@ foreach ($result as $row) {
 						<li><i class="fa fa-user"></i> <?php echo LANG_VALUE_13; ?> <?php echo $_SESSION['customer']['cust_name']; ?></li>
 						<li><a href="dashboard.php"><i class="fa fa-home"></i> <?php echo LANG_VALUE_89; ?></a></li>
 						<?php
-					} else {
+					}
+					else if(!isset($_SESSION['customer']) && !isset($_SESSION['access_token'])){
 						?>
 						<li><a href="login.php"><i class="fa fa-sign-in"></i> <?php echo LANG_VALUE_9; ?></a></li>
 						<li><a href="registration.php"><i class="fa fa-user-plus"></i> <?php echo LANG_VALUE_15; ?></a></li>
 						<?php	
+					} 
+					else {
+						?>
+						<li><i class="fa fa-user"></i> <?php echo 'Logged in with ' ?> <?php echo 'Google' ?></li>
+						<li><a href="dashboard.php"><i class="fa fa-home"></i> <?php echo LANG_VALUE_89; ?></a></li>
+						<?php
 					}
 					?>
 
