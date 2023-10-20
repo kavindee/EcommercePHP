@@ -1,25 +1,43 @@
 <?php require_once('header.php'); ?>
 
 <?php
-$statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
-$statement->execute();
-$result = $statement->fetchAll(PDO::FETCH_ASSOC);                            
+// $statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
+// $statement->execute();
+// $result = $statement->fetchAll(PDO::FETCH_ASSOC); 
+
+$statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=:id"); //use Prepared Statements.
+$statement->execute(array(':id' => 1));
+$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+
 foreach ($result as $row) {
     $banner_reset_password = $row['banner_reset_password'];
 }
 ?>
 
 <?php
-if( !isset($_GET['email']) || !isset($_GET['token']) )
-{
-    header('location: '.BASE_URL.'login.php');
-    exit;
-}
+// if( !isset($_GET['email']) || !isset($_GET['token']) )
+// {
+//     header('location: '.BASE_URL.'login.php');
+//     exit;
+// } 
 
+if (!isset($_GET['email']) || !isset($_GET['token'])) {
+    // Fix: Validate and sanitize email and token inputs.
+    $email = filter_var($_GET['email'], FILTER_VALIDATE_EMAIL);
+    $token = preg_match('/^[a-zA-Z0-9]+$/', $_GET['token']);
+    
+    if (!$email || !$token) {
+        header('location: ' . BASE_URL . 'login.php');
+        exit;
+    }
+}
+// Use prepared statements
 $statement = $pdo->prepare("SELECT * FROM tbl_customer WHERE cust_email=? AND cust_token=?");
 $statement->execute(array($_GET['email'],$_GET['token']));
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 $tot = $statement->rowCount();
+
 if($tot == 0)
 {
     header('location: '.BASE_URL.'login.php');
