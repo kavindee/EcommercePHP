@@ -1,8 +1,11 @@
 <?php require_once('header.php'); ?>
 
 <?php
-$statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
-$statement->execute();
+
+//Use a prepared statement and parameterized query to prevent SQL injection.
+$statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=:id");
+$statement->execute(array(':id' => 1));
+
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);                           
 foreach ($result as $row) {
     $banner_forget_password = $row['banner_forget_password'];
